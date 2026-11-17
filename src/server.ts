@@ -46,8 +46,8 @@ const drivers = [
   { id: 22, name: "Valtteri Bottas", team: "Cadillac" },
 ];
 
-interface DriverQuery {
-  team?: string;
+interface TeamParams {
+  teamName: string;
 }
 
 interface DriverParams {
@@ -59,19 +59,32 @@ server.get("/teams", async (request, response) => {
   return { teams };
 });
 
-server.get<{ Querystring: DriverQuery }>("/drivers", async (request, response) => {
-  const requestedTeam = request.query.team?.trim();
-  const filteredDrivers = requestedTeam
-    ? drivers.filter(
-        (driver) =>
-          driver.team.toLocaleLowerCase("pt-BR") ===
-          requestedTeam.toLocaleLowerCase("pt-BR"),
-      )
-    : drivers;
-
+server.get("/drivers", async (request, response) => {
   response.type("application/json").code(200);
-  return { drivers: filteredDrivers };
+  return { drivers };
 });
+
+server.get<{ Params: TeamParams }>(
+  "/teams/:teamName/drivers",
+  async (request, response) => {
+    const requestedName = request.params.teamName.trim();
+    const team = teams.find(
+      (item) =>
+        item.name.toLocaleLowerCase("pt-BR") ===
+        requestedName.toLocaleLowerCase("pt-BR"),
+    );
+
+    if (!team) {
+      response.type("application/json").code(404);
+      return { message: "Team Not Found" };
+    }
+
+    const teamDrivers = drivers.filter((driver) => driver.team === team.name);
+
+    response.type("application/json").code(200);
+    return { team: team.name, drivers: teamDrivers };
+  },
+);
 
 server.get<{ Params: DriverParams }>(
   "/drivers/:id",

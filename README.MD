@@ -64,10 +64,10 @@ Resposta: objeto com a propriedade `drivers`, contendo o ID, nome e equipe de ca
 ### Filtrar pilotos por equipe
 
 ```http
-GET /drivers?team=McLaren
+GET /teams/McLaren/drivers
 ```
 
-O filtro ignora diferenças entre letras maiúsculas e minúsculas, então `?team=mclaren` também funciona. Se não houver uma equipe correspondente, a API retorna `200` com `drivers` como lista vazia.
+O nome da equipe não diferencia letras maiúsculas de minúsculas. Por exemplo, `/teams/mclaren/drivers` também funciona. Nomes com espaços devem usar `%20`, como `/teams/Red%20Bull%20Racing/drivers`. Se a equipe não existir, a API retorna `404` com a mensagem `Team Not Found`.
 
 ### Consultar piloto por ID
 
@@ -92,7 +92,7 @@ Quando o piloto existe, a resposta contém o objeto `driver`. Quando não existe
 
 ### O que cada parte faz
 
-- `src/server.ts`: cria a instância Fastify, registra o CORS, mantém os dados da temporada e implementa `/teams`, `/drivers`, `/drivers?team=...` e `/drivers/:id`.
+- `src/server.ts`: cria a instância Fastify, registra o CORS, mantém os dados da temporada e implementa `/teams`, `/drivers`, `/teams/:teamName/drivers` e `/drivers/:id`.
 - `.env.example`: fornece um exemplo de configuração. Copie-o para `.env` e ajuste `PORT` se quiser usar outra porta.
 - `.gitignore`: evita enviar ao repositório dependências instaladas, arquivos de ambiente e arquivos gerados.
 - `package.json`: guarda o nome e a descrição do projeto, os pacotes usados e comandos como `npm run start:dev`.
