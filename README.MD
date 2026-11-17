@@ -1,6 +1,6 @@
-# API de Fórmula 1 — equipes e pilotos
+# API de Fórmula 1 — projeto do curso de Node.js da DIO
 
-API REST para consultar informações de equipes e pilotos da Fórmula 1. O projeto foi desenvolvido em Node.js e TypeScript com Fastify.
+Projeto desenvolvido como desafio do curso de Node.js da DIO. Esta API REST consulta equipes e pilotos da Fórmula 1 e foi implementada em Node.js, TypeScript e Fastify.
 
 ## Funcionalidades
 
@@ -108,3 +108,4 @@ Quando o piloto existe, a resposta contém o objeto `driver`. Quando não existe
 ## Dados
 
 As equipes e os pilotos estão cadastrados em arrays no arquivo `src/server.ts`. Para adicionar um item, inclua um objeto com os mesmos campos dos registros existentes. Os IDs dos pilotos devem ser únicos para que a busca por ID retorne um único resultado.
+
