@@ -12,50 +12,81 @@ const teams = [
   { id: 2, name: "Mercedes", base: "Brackley, United Kingdom" },
   { id: 3, name: "Red Bull Racing", base: "Milton Keynes, United Kingdom" },
   { id: 4, name: "Ferrari", base: "Maranello, Italy" },
-  { id: 5, name: "Alpine", base: "Enstone, United Kingdom" },
-  { id: 6, name: "Aston Martin", base: "Silverstone, United Kingdom" },
-  { id: 7, name: "Alfa Romeo Racing", base: "Hinwil, Switzerland" },
-  { id: 8, name: "AlphaTauri", base: "Faenza, Italy" },
+  { id: 5, name: "Aston Martin", base: "Silverstone, United Kingdom" },
+  { id: 6, name: "Alpine", base: "Enstone, United Kingdom" },
+  { id: 7, name: "Haas", base: "Kannapolis, United States" },
+  { id: 8, name: "Racing Bulls", base: "Faenza, Italy" },
   { id: 9, name: "Williams", base: "Grove, United Kingdom" },
-  { id: 10, name: "Haas", base: "Kannapolis, United States" },
-  { id: 11, name: "Uralkali Haas F1 Team", base: "Banbury, United Kingdom" },
-  { id: 12, name: "Scuderia Toro Rosso", base: "Faenza, Italy" },
+  { id: 10, name: "Audi", base: "Hinwil, Switzerland" },
+  { id: 11, name: "Cadillac", base: "Fishers, Indiana, United States" },
 ];
 
 const drivers = [
-  { id: 1, name: "Max Verstappen", team: "Red Bull Racing" },
-  { id: 2, name: "Lewis Hamilton", team: "Ferrari" },
-  { id: 2, name: "Lando Norris", team: "McLaren" },
+  { id: 1, name: "Lando Norris", team: "McLaren" },
+  { id: 2, name: "Oscar Piastri", team: "McLaren" },
+  { id: 3, name: "George Russell", team: "Mercedes" },
+  { id: 4, name: "Kimi Antonelli", team: "Mercedes" },
+  { id: 5, name: "Max Verstappen", team: "Red Bull Racing" },
+  { id: 6, name: "Isack Hadjar", team: "Red Bull Racing" },
+  { id: 7, name: "Charles Leclerc", team: "Ferrari" },
+  { id: 8, name: "Lewis Hamilton", team: "Ferrari" },
+  { id: 9, name: "Fernando Alonso", team: "Aston Martin" },
+  { id: 10, name: "Lance Stroll", team: "Aston Martin" },
+  { id: 11, name: "Pierre Gasly", team: "Alpine" },
+  { id: 12, name: "Franco Colapinto", team: "Alpine" },
+  { id: 13, name: "Esteban Ocon", team: "Haas" },
+  { id: 14, name: "Oliver Bearman", team: "Haas" },
+  { id: 15, name: "Liam Lawson", team: "Racing Bulls" },
+  { id: 16, name: "Arvid Lindblad", team: "Racing Bulls" },
+  { id: 17, name: "Alexander Albon", team: "Williams" },
+  { id: 18, name: "Carlos Sainz", team: "Williams" },
+  { id: 19, name: "Nico Hülkenberg", team: "Audi" },
+  { id: 20, name: "Gabriel Bortoleto", team: "Audi" },
+  { id: 21, name: "Sergio Pérez", team: "Cadillac" },
+  { id: 22, name: "Valtteri Bottas", team: "Cadillac" },
 ];
+
+interface DriverQuery {
+  team?: string;
+}
+
+interface DriverParams {
+  id: string;
+}
 
 server.get("/teams", async (request, response) => {
   response.type("application/json").code(200);
   return { teams };
 });
 
-server.get("/drivers", async (request, response) => {
-  response.type("application/json").code(200);
-  return { drivers };
-});
+server.get<{ Querystring: DriverQuery }>("/drivers", async (request, response) => {
+  const requestedTeam = request.query.team?.trim();
+  const filteredDrivers = requestedTeam
+    ? drivers.filter(
+        (driver) =>
+          driver.team.toLocaleLowerCase("pt-BR") ===
+          requestedTeam.toLocaleLowerCase("pt-BR"),
+      )
+    : drivers;
 
-interface DriverParams {
-  id: string;
-}
+  response.type("application/json").code(200);
+  return { drivers: filteredDrivers };
+});
 
 server.get<{ Params: DriverParams }>(
   "/drivers/:id",
   async (request, response) => {
-    const id = parseInt(request.params.id);
-    const driver = drivers.find((d) => d.id === id);
+    const id = Number(request.params.id);
+    const driver = drivers.find((item) => item.id === id);
 
     if (!driver) {
       response.type("application/json").code(404);
       return { message: "Driver Not Found" };
-    } else {
-      response.type("application/json").code(200);
-      return { driver };
     }
-  }
+
+    response.type("application/json").code(200);
+    return { driver };
+  },
 );
 
 const port = Number(process.env.PORT) || 3333;
@@ -64,5 +95,3 @@ server.listen({ port }, (error, address) => {
   if (error) throw error;
   server.log.info(`Server listening at ${address}`);
 });
-
-

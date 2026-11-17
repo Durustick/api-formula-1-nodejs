@@ -1,11 +1,12 @@
 # API de Fórmula 1 — projeto do curso de Node.js da DIO
 
-Projeto desenvolvido como desafio do curso de Node.js da DIO. Esta API REST consulta equipes e pilotos da Fórmula 1 e foi implementada em Node.js, TypeScript e Fastify.
+Projeto desenvolvido como desafio do curso de Node.js da DIO. Esta API REST apresenta as equipes e os pilotos da temporada 2026 da Fórmula 1 e oferece consulta individual e filtro de pilotos por equipe.
 
 ## Funcionalidades
 
-- Lista as equipes cadastradas e suas sedes.
-- Lista os pilotos cadastrados e suas equipes.
+- Lista as 11 equipes e suas sedes.
+- Lista os 22 pilotos da temporada 2026.
+- Filtra pilotos pelo nome da equipe, sem diferenciar maiúsculas de minúsculas.
 - Busca um piloto pelo ID.
 - Retorna erro HTTP 404 quando o ID não existe.
 - Permite chamadas de outros endereços por meio do CORS.
@@ -52,7 +53,7 @@ GET /teams
 
 Resposta: objeto com a propriedade `teams`, contendo o ID, nome e sede de cada equipe.
 
-### Listar pilotos
+### Listar todos os pilotos
 
 ```http
 GET /drivers
@@ -60,13 +61,15 @@ GET /drivers
 
 Resposta: objeto com a propriedade `drivers`, contendo o ID, nome e equipe de cada piloto.
 
-### Consultar piloto por ID
+### Filtrar pilotos por equipe
 
 ```http
-GET /drivers/{id}
+GET /drivers?team=McLaren
 ```
 
-Exemplo:
+O filtro ignora diferenças entre letras maiúsculas e minúsculas, então `?team=mclaren` também funciona. Se não houver uma equipe correspondente, a API retorna `200` com `drivers` como lista vazia.
+
+### Consultar piloto por ID
 
 ```http
 GET /drivers/1
@@ -79,7 +82,7 @@ Quando o piloto existe, a resposta contém o objeto `driver`. Quando não existe
 ```text
 .
 ├── src/
-│   └── server.ts       # cria o Fastify, registra CORS e implementa as rotas
+│   └── server.ts       # dados das equipes/pilotos e rotas HTTP
 ├── .env.example        # modelo da variável de ambiente PORT
 ├── .gitignore          # arquivos locais que não devem ir para o Git
 ├── package.json        # informações do projeto, dependências e scripts npm
@@ -89,7 +92,7 @@ Quando o piloto existe, a resposta contém o objeto `driver`. Quando não existe
 
 ### O que cada parte faz
 
-- `src/server.ts`: cria a instância Fastify, registra o CORS, mantém os dados de equipes e pilotos e implementa `/teams`, `/drivers` e `/drivers/:id`.
+- `src/server.ts`: cria a instância Fastify, registra o CORS, mantém os dados da temporada e implementa `/teams`, `/drivers`, `/drivers?team=...` e `/drivers/:id`.
 - `.env.example`: fornece um exemplo de configuração. Copie-o para `.env` e ajuste `PORT` se quiser usar outra porta.
 - `.gitignore`: evita enviar ao repositório dependências instaladas, arquivos de ambiente e arquivos gerados.
 - `package.json`: guarda o nome e a descrição do projeto, os pacotes usados e comandos como `npm run start:dev`.
@@ -105,7 +108,8 @@ Quando o piloto existe, a resposta contém o objeto `driver`. Quando não existe
 | `npm run dist` | Compila o código TypeScript para JavaScript na pasta `dist/`. |
 | `npm run start:dist` | Compila o projeto e inicia a versão JavaScript gerada. |
 
-## Dados
+## Dados e fontes
 
-As equipes e os pilotos estão cadastrados em arrays no arquivo `src/server.ts`. Para adicionar um item, inclua um objeto com os mesmos campos dos registros existentes. Os IDs dos pilotos devem ser únicos para que a busca por ID retorne um único resultado.
+As equipes e pilotos são mantidos em arrays no arquivo `src/server.ts`. Os IDs são únicos e servem para a rota de consulta individual. Para atualizar a formação da temporada, edite essas listas.
 
+A formação de 2026 foi baseada na [lista oficial de pilotos da Fórmula 1](https://www.formula1.com/en/drivers) e na [lista de inscritos da FIA para o GP de São Paulo de 2026](https://www.fia.com/system/files/decision-document/2026_sao_paulo_grand_prix_-_entry_list.pdf).
